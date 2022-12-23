@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.24)
+project(21_5_4_Implementation_of_a_turn_based_role_playing_game)
+
+set(CMAKE_CXX_STANDARD 14)
+
+add_executable(21_5_4_Implementation_of_a_turn_based_role_playing_game main.cpp)

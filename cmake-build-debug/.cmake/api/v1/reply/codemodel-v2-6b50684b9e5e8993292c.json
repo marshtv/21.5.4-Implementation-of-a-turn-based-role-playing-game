@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.24"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "21_5_4_Implementation_of_a_turn_based_role_playing_game",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "21_5_4_Implementation_of_a_turn_based_role_playing_game::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-21_5_4_Implementation_of_a_turn_based_role_playing_game-Debug-02d4f664c20c67cb4241.json",
+					"name" : "21_5_4_Implementation_of_a_turn_based_role_playing_game",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "F:/__C++/Skillbox/21/21.5.4 Implementation of a turn-based role-playing game/cmake-build-debug",
+		"source" : "F:/__C++/Skillbox/21/21.5.4 Implementation of a turn-based role-playing game"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
