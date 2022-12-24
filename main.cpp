@@ -25,8 +25,7 @@ void save_game(std::ofstream& save_file, character players[]) {
 		save_file.write((char *) &(players[i].health), sizeof(players[i].health));
 		save_file.write((char *) &(players[i].armor), sizeof(players[i].armor));
 		save_file.write((char *) &(players[i].damage), sizeof(players[i].damage));
-		save_file.write((char *) &(players[i].position.row), sizeof(players[i].position.row));
-		save_file.write((char *) &(players[i].position.col), sizeof(players[i].position.col));
+		save_file.write((char *) &(players[i].position), sizeof(players[i].position));
 	}
 }
 
@@ -37,8 +36,7 @@ void load_game(std::ifstream& save_file, character players[]) {
 		save_file.read((char *) &(players[i].health), sizeof(players[i].health));
 		save_file.read((char *) &(players[i].armor), sizeof(players[i].armor));
 		save_file.read((char *) &(players[i].damage), sizeof(players[i].damage));
-		save_file.read((char *) &(players[i].position.row), sizeof(players[i].position.row));
-		save_file.read((char *) &(players[i].position.col), sizeof(players[i].position.col));
+		save_file.read((char *) &(players[i].position), sizeof(players[i].position));
 	}
 }
 
