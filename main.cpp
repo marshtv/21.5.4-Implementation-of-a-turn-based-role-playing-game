@@ -11,13 +11,20 @@ struct grid {
 	int col;
 };
 
+/*enum EMove {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT
+};
+
 //declare struct for command to move on war field.
-struct move {
+struct move_control {
 	char up = 'w';
 	char down = 's';
 	char left = 'a';
 	char right = 'd';
-};
+};*/
 
 //declare struct for save all parameters of character.
 struct character {
@@ -28,6 +35,38 @@ struct character {
 	int damage = 30;
 	grid position = {0, 0};
 };
+
+void init_players (character& player, std::vector<character>& players,
+				   char curr_pos[][20], int& player_num, std::string& user_name) {
+	player.ident_flag = 'P';
+	player.name = user_name;
+	player.health = 150;
+	player.armor = 50;
+	player.damage = 30;
+	player.position.row = std::rand() % 20;
+	player.position.col = std::rand() % 20;
+	while (curr_pos[player.position.row][player.position.col] != '.') {
+		player.position.row = std::rand() % 20;
+		player.position.col = std::rand() % 20;
+	}
+	curr_pos[player.position.row][player.position.col] = 'P';
+	players.push_back(player);
+	for (int i = 1; i < player_num; i++) {
+		player.ident_flag = 'E';
+		player.name = "Enemy #" + std::to_string(i);
+		player.health = (std::rand() % 51) + 100;
+		player.armor = std::rand() % 51;
+		player.damage = (std::rand() % 15) + 15;
+		player.position.row = std::rand() % 20;
+		player.position.col = std::rand() % 20;
+		while (curr_pos[player.position.row][player.position.col] != '.') {
+			player.position.row = std::rand() % 20;
+			player.position.col = std::rand() % 20;
+		}
+		curr_pos[player.position.row][player.position.col] = 'E';
+		players.push_back(player);
+	}
+}
 
 //Function for save required parameters to save-file.
 void save_game(std::ofstream& save_file, std::vector<character>& players, int& player_num) {
@@ -79,6 +118,51 @@ void print_field(char position[20][20]) {
 	}
 }
 
+void attack()
+
+void move_player(char curr_pos[][20], character& player, std::vector<character>& players, int& player_num) {
+	grid prev_pos = player.position;
+	grid next_pos = prev_pos;
+	char turn_char;
+	std::cin >> turn_char;
+	while (turn_char != 'w' && turn_char != 's' && turn_char != 'a' && turn_char != 'd') {
+		std::cout << "Incorrect input! Input direction (w/s/a/d):";
+		std::cin >> turn_char;
+	}
+	switch (turn_char) {
+		case 'w':
+			next_pos.row--;
+			break;
+		case 's':
+			next_pos.row++;
+			break;
+		case 'a':
+			next_pos.col--;
+			break;
+		case 'd':
+			next_pos.col++;
+			break;
+	}
+	if (next_pos.row < 0 || next_pos.row > 19 || next_pos.col < 0 || next_pos.col > 19)
+		std::cout << "incorrect turn!!! You Pass the turn!" << std::endl;
+	else {
+		if (curr_pos[next_pos.row][next_pos.col] == '.') {
+			curr_pos[prev_pos.row][prev_pos.col] = '.';
+			curr_pos[next_pos.row][next_pos.col] = player.ident_flag;
+			player.position = next_pos;
+		} else if (curr_pos[next_pos.row][next_pos.col] == 'P' && player.ident_flag == 'E') {
+
+		}
+		else if (curr_pos[next_pos.row][next_pos.col] == 'E' && player.ident_flag == 'P') {
+			for (int i = 1; i < player_num; i++) {
+				if (players[i].position.row == next_pos.row && players[i].position.col == next_pos.col) {
+					attack();
+				}
+			}
+		}
+	}
+}
+
 int main() {
 	//extended randomization.
 	std::srand(std::time(nullptr));
@@ -86,7 +170,6 @@ int main() {
 	//declare local variables.
 	//Giving allowing input for username.
 	std::string user_name;
-
 	//variable for action command.
 	std::string action_command;
 	//two-dimensional array for save player's position.
@@ -103,66 +186,94 @@ int main() {
 	//vector of structs for save all players
 	std::vector<character> players;
 
-	std::cout << "Start Game" << std::endl;
-	std::cout << "-------------------------------------------------------------" << std::endl;
-	//Selecting actions save or load.
-	std::cout << "Input action (save/load):";
-	std::cin >> action_command;
-	while (action_command != "save" && action_command != "load") {
-		std::cout << "ERROR input command. Try again." << std::endl;
-		std::cout << "Input action (save/load):";
-		std::cin >> action_command;
+	char select_y_n;
+	std::cout << "Start New Game? (y/n):";
+	std::cin >> select_y_n;
+	while (select_y_n != 'y' && select_y_n != 'n') {
+		std::cout << "Incorrect input! Try again!" << std::endl;
+		std::cout << "Start New Game? (y/n):";
+		std::cin >> select_y_n;
 	}
-	if (action_command == "save") {
+	if (select_y_n == 'y') {
+		std::cout << "-------------------------------------------------------------" << std::endl;
 		std::cout << "Input name of your person:" << std::endl;
 		std::cin >> user_name;
-
-		//Init the player's parameters and collect it to vector
-		for (int i = 0; i < player_num - 1; i++) {
-			player.ident_flag = 'E';
-			player.name = "Enemy #" + std::to_string(i);
-			player.health = (std::rand() % 51) + 100;
-			player.armor = std::rand() % 51;
-			player.damage = (std::rand() % 15) + 15;
-			player.position.row = std::rand() % 20;
-			player.position.col = std::rand() % 20;
-			while (curr_pos[player.position.row][player.position.col] != '.') {
-				player.position.row = std::rand() % 20;
-				player.position.col = std::rand() % 20;
-			}
-			curr_pos[player.position.row][player.position.col] = 'E';
-			players.push_back(player);
-		}
-		player.ident_flag = 'P';
-		player.name = user_name;
-		player.health = 150;
-		player.armor = 50;
-		player.damage = 30;
-		player.position.row = std::rand() % 20;
-		player.position.col = std::rand() % 20;
-		while (curr_pos[player.position.row][player.position.col] != '.') {
-			player.position.row = std::rand() % 20;
-			player.position.col = std::rand() % 20;
-		}
-		curr_pos[player.position.row][player.position.col] = 'P';
-		players.push_back(player);
-
-		std::ofstream save_file("save.bin", std::ios::binary);
-		save_game(save_file, players, player_num);
-		save_file.close();
+		init_players(player, players, curr_pos, player_num, user_name);
+		print_field(curr_pos);
 	} else {
-		std::ifstream save_file("save.bin", std::ios::binary);
-		load_game(save_file, player, players, player_num);
-		save_file.close();
-		for (int i = 0; i < player_num; i++) {
-			if (i < player_num - 1)
-				curr_pos[players[i].position.row][players[i].position.col] = 'E';
-			else
-				curr_pos[players[i].position.row][players[i].position.col] = 'P';
+		//Selecting actions save or load.
+		std::cout << "Input action (save/load):";
+		std::cin >> action_command;
+		while (action_command != "save" && action_command != "load") {
+			std::cout << "ERROR input command. Try again." << std::endl;
+			std::cout << "Input action (save/load):";
+			std::cin >> action_command;
+		}
+		if (action_command == "save") {
+			std::ofstream save_file("save.bin", std::ios::binary);
+			save_game(save_file, players, player_num);
+			save_file.close();
+			std::cout << "-------------------------------------------------------------" << std::endl;
+			print_field(curr_pos);
+		} else {
+			std::ifstream save_file("save.bin", std::ios::binary);
+			if (save_file.is_open()) {
+				load_game(save_file, player, players, player_num);
+				save_file.close();
+				for (int i = 0; i < player_num; i++) {
+					if (i > 0)
+						curr_pos[players[i].position.row][players[i].position.col] = 'E';
+					else
+						curr_pos[players[i].position.row][players[i].position.col] = 'P';
+				}
+				std::cout << "-------------------------------------------------------------" << std::endl;
+				print_field(curr_pos);
+			} else {
+				std::cout << "ERROR, File not exist!" << std::endl;
+				std::cout << "Do you want to Start New Game? (y/n):";
+				std::cin >> select_y_n;
+				while (select_y_n != 'y' && select_y_n != 'n') {
+					std::cout << "Incorrect input! Try again!" << std::endl;
+					std::cout << "Start New Game? (y/n):";
+					std::cin >> select_y_n;
+				}
+				if (select_y_n == 'y') {
+					std::cout << "-------------------------------------------------------------" << std::endl;
+					std::cout << "Input name of your person:" << std::endl;
+					std::cin >> user_name;
+					init_players(player, players, curr_pos, player_num, user_name);
+					print_field(curr_pos);
+				} else {
+					std::cout << "-------------------------------------------------------------" << std::endl;
+					std::cout << "Good by!" << std::endl;
+					return 0;
+				}
+			}
 		}
 	}
 
-	std::cout << "-------------------------------------------------------------" << std::endl;
-	print_field(curr_pos);
+	while (player_num > 1) {
+		std::cout << "Your turn! (w, s, a, d):";
+		move_player(curr_pos, players[0], players, player_num);
 
+
+
+		std::cout << "Do you want to Save and Exit (y/n):";
+		std::cin >> select_y_n;
+		while (select_y_n != 'y' && select_y_n != 'n') {
+			std::cout << "Incorrect input! Try again!" << std::endl;
+			std::cout << "Do you want to Save and Exit (y/n):";
+			std::cin >> select_y_n;
+		}
+		if (select_y_n == 'y') {
+			std::ofstream save_file("save.bin", std::ios::binary);
+			save_game(save_file, players, player_num);
+			save_file.close();
+			std::cout << "-------------------------------------------------------------" << std::endl;
+			std::cout << "Save complete! Good by!" << std::endl;
+			return 0;
+		}
+	}
+
+	return 0;
 }
