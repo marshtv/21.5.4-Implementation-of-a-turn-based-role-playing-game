@@ -133,6 +133,7 @@ void delete_player(character& player, std::vector<character>& players, int& coun
 
 //Function for implementation of attack process.
 void attack(character& attacker, character& attacked, std::vector<character>& players, int& count, int& player_num, bool& killed) {
+	std::cout << "-------------------------------------------------------------" << std::endl;
 	attacked.armor -= attacker.damage;
 	if (attacked.armor <= 0) {
 		attacked.health += attacked.armor;
@@ -189,6 +190,7 @@ void move_player(char& turn_char, char curr_pos[][20], character& player, std::v
 			attack(player, players[count], players, count, player_num, killed);
 			if(killed) {
 				player.position = next_pos;
+				curr_pos[next_pos.row][next_pos.col] = 'E';
 				curr_pos[prev_pos.row][prev_pos.col] = '.';
 			}
 		} else if (curr_pos[next_pos.row][next_pos.col] == 'E' && player.ident_flag == 'P') {
@@ -200,6 +202,9 @@ void move_player(char& turn_char, char curr_pos[][20], character& player, std::v
 			attack(players[0], players[count], players, count, player_num, killed);
 			if(killed) {
 				player.position = next_pos;
+				player.health = 150;
+				player.armor = 50;
+				curr_pos[next_pos.row][next_pos.col] = 'P';
 				curr_pos[prev_pos.row][prev_pos.col] = '.';
 			}
 		}
@@ -300,6 +305,8 @@ int main() {
 		std::cout << "Your turn! (w, s, a, d):";
 		char turn_char;
 		std::cin >> turn_char;
+		std::cout << "-------------------------------------------------------------" << std::endl;
+		std::cout << players[0].name << " make turn:" << std::endl;
 		move_player(turn_char, curr_pos, players[0], players, player_num);
 		for (int i = 1; i < player_num; i++) {
 			switch (std::rand() % 4) {
@@ -317,6 +324,8 @@ int main() {
 					turn_char = 'd';
 					break;
 			}
+			std::cout << "-------------------------------------------------------------" << std::endl;
+			std::cout << players[i].name << " make turn:" << std::endl;
 			move_player(turn_char, curr_pos, players[i], players, player_num);
 		}
 
