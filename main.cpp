@@ -36,6 +36,7 @@ struct character {
 	grid position = {0, 0};
 };
 
+//Initiating player's struct.
 void init_players (character& player, std::vector<character>& players,
 				   char curr_pos[][20], int& player_num, std::string& user_name) {
 	player.ident_flag = 'P';
@@ -104,7 +105,7 @@ void load_game(std::ifstream& save_file, character& player, std::vector<characte
 }
 
 //Function for display to console current state of war field.
-void print_field(char position[20][20]) {
+void print_field(char position[][20]) {
 	std::cout << "   0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19" <<std::endl;
 	for (int i = 0; i < 20; i++) {
 		if (i < 10)
@@ -118,30 +119,54 @@ void print_field(char position[20][20]) {
 	}
 }
 
-void attack(character& attacker, character& attacked, std::vector<character>& players, int& player_num) {
+//Function for deleting player's struct from vector.
+void delete_player(character& player, std::vector<character>& players, int& count, int& player_num) {
+	if (count == player_num - 1)
+		players.pop_back();
+	else {
+		for (int i = count; i < player_num - 1; i++)
+			players[i] = players[i + 1];
+		players.pop_back();
+	}
+	player_num--;
+}
+
+//Function for implementation of attack process.
+void attack(character& attacker, character& attacked, std::vector<character>& players, int& count, int& player_num, bool& killed) {
 	attacked.armor -= attacker.damage;
 	if (attacked.armor <= 0) {
 		attacked.health += attacked.armor;
 		attacked.armor = 0;
 	}
+	std::cout << "Player " << attacker.name << " attack to " << attacked.name << std::endl;
 	if (attacked.health <= 0) {
-		players.
+		std::cout << "Player " << attacked.name << " KILLED." << std::endl;
+		delete_player(attacked, players, count, player_num);
+		killed = true;
+	} else {
+		std::cout << attacked.name << " status:" << std::endl;
+		std::cout << "Armor: "<< attacked.armor << std::endl;
+		std::cout << "Health: "<< attacked.health << std::endl;
+		killed = false;
 	}
 }
 
-void move_player(char curr_pos[][20], character& player, std::vector<character>& players, int& player_num) {
+//Function for move players on war field.
+void move_player(char& turn_char, char curr_pos[][20], character& player, std::vector<character>& players, int& player_num) {
 	grid prev_pos = player.position;
 	grid next_pos = prev_pos;
-	char turn_char;
-	std::cin >> turn_char;
+	int count;
+	bool killed = false;
+
 	while (turn_char != 'w' && turn_char != 's' && turn_char != 'a' && turn_char != 'd') {
 		std::cout << "Incorrect input! Input direction (w/s/a/d):";
 		std::cin >> turn_char;
 	}
 	switch (turn_char) {
-		case 'w':
-			next_pos.row--;
-			break;
+		default:
+			case 'w':
+				next_pos.row--;
+				break;
 		case 's':
 			next_pos.row++;
 			break;
@@ -160,16 +185,26 @@ void move_player(char curr_pos[][20], character& player, std::vector<character>&
 			curr_pos[next_pos.row][next_pos.col] = player.ident_flag;
 			player.position = next_pos;
 		} else if (curr_pos[next_pos.row][next_pos.col] == 'P' && player.ident_flag == 'E') {
-			attack(player, players[0], players, player_num);
-		}
-		else if (curr_pos[next_pos.row][next_pos.col] == 'E' && player.ident_flag == 'P') {
+			count = 0;
+			attack(player, players[count], players, count, player_num, killed);
+			if(killed) {
+				player.position = next_pos;
+				curr_pos[prev_pos.row][prev_pos.col] = '.';
+			}
+		} else if (curr_pos[next_pos.row][next_pos.col] == 'E' && player.ident_flag == 'P') {
 			for (int i = 1; i < player_num; i++) {
 				if (players[i].position.row == next_pos.row && players[i].position.col == next_pos.col) {
-					attack(players[0], players[i], players, player_num);
+					count = i;
 				}
+			}
+			attack(players[0], players[count], players, count, player_num, killed);
+			if(killed) {
+				player.position = next_pos;
+				curr_pos[prev_pos.row][prev_pos.col] = '.';
 			}
 		}
 	}
+	print_field(curr_pos);
 }
 
 int main() {
@@ -263,9 +298,44 @@ int main() {
 
 	while (player_num > 1) {
 		std::cout << "Your turn! (w, s, a, d):";
-		move_player(curr_pos, players[0], players, player_num);
+		char turn_char;
+		std::cin >> turn_char;
+		move_player(turn_char, curr_pos, players[0], players, player_num);
+		for (int i = 1; i < player_num; i++) {
+			switch (std::rand() % 4) {
+				default:
+					case 0:
+						turn_char = 'w';
+						break;
+				case 1:
+					turn_char = 's';
+					break;
+				case 2:
+					turn_char = 'a';
+					break;
+				case 3:
+					turn_char = 'd';
+					break;
+			}
+			move_player(turn_char, curr_pos, players[i], players, player_num);
+		}
 
-
+		if (player_num == 1 && players[0].ident_flag == 'P') {
+			std::cout << "*************************************************************" << std::endl;
+			std::cout << "Congratulations!!!!" << std::endl;
+			std::cout << players[0].name << " is WON." << std::endl;
+			return 0;
+		}
+		int p_count = 0;
+		for (int i = 0; i < player_num; i++) {
+			if (players[i].ident_flag == 'P')
+				p_count++;
+		}
+		if (p_count == 0) {
+			std::cout << "*************************************************************" << std::endl;
+			std::cout << "Sorry! Your Loose!" << std::endl;
+			return 0;
+		}
 
 		std::cout << "Do you want to Save and Exit (y/n):";
 		std::cin >> select_y_n;
@@ -283,6 +353,5 @@ int main() {
 			return 0;
 		}
 	}
-
 	return 0;
 }
