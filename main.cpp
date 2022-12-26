@@ -118,7 +118,16 @@ void print_field(char position[20][20]) {
 	}
 }
 
-void attack()
+void attack(character& attacker, character& attacked, std::vector<character>& players, int& player_num) {
+	attacked.armor -= attacker.damage;
+	if (attacked.armor <= 0) {
+		attacked.health += attacked.armor;
+		attacked.armor = 0;
+	}
+	if (attacked.health <= 0) {
+		players.
+	}
+}
 
 void move_player(char curr_pos[][20], character& player, std::vector<character>& players, int& player_num) {
 	grid prev_pos = player.position;
@@ -151,12 +160,12 @@ void move_player(char curr_pos[][20], character& player, std::vector<character>&
 			curr_pos[next_pos.row][next_pos.col] = player.ident_flag;
 			player.position = next_pos;
 		} else if (curr_pos[next_pos.row][next_pos.col] == 'P' && player.ident_flag == 'E') {
-
+			attack(player, players[0], players, player_num);
 		}
 		else if (curr_pos[next_pos.row][next_pos.col] == 'E' && player.ident_flag == 'P') {
 			for (int i = 1; i < player_num; i++) {
 				if (players[i].position.row == next_pos.row && players[i].position.col == next_pos.col) {
-					attack();
+					attack(players[0], players[i], players, player_num);
 				}
 			}
 		}
